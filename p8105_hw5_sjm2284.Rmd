@@ -5,3 +5,58 @@ date: "2024-11-05"
 output: github_document
 ---
 
+```{r}
+library(tidyverse)
+library(rvest)
+library(stringr)
+library(tibble)
+
+```
+
+
+## Problem 1 
+
+```{r}
+
+same_birthday = function(n) { 
+  birthday = sample(1:365, n, replace = TRUE)
+  return(length(birthday) != length(unique(birthday))) 
+  }
+
+n = 30 
+results = same_birthday(n) 
+
+# False -> all birthdays are unique , TRUE -> there are duplicate birthdays 
+
+```
+
+```{r}
+
+simulate_probabilities = function(group_size, num_simulations) {
+  results = map(1:num_simulations, ~same_birthday(group_size))
+  mean(unlist(results)) }
+
+group_sizes = 2:50 
+probabilities = map_dbl(group_sizes, ~simulate_probabilities(.x, 10000))
+
+
+results_table = tibble(
+  group_size = group_sizes, probability = probabilities)
+
+```
+
+```{r}
+
+ggplot( results_table, aes( x = group_size, y = probability)) + geom_line() + geom_point()+
+  labs (
+    title = "Group Size vs Probaility of Same Birthday ",
+    x = "Group Size",
+    y = "Probability"
+  )
+
+```
+
+
+## Problem 2
+
+
