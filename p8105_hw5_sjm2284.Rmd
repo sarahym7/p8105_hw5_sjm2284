@@ -95,7 +95,20 @@ results_df =
 ```
 
 
+```{r}
 
+ggplot( results_df, aes( x = mu, y = power)) + geom_line() + geom_point()+
+  labs (
+    title = " Proportion of Times Null Was Rejected vs Mu",
+    x = "True Value of Mu",
+    y = "Power"
+  )
+
+
+
+
+```
+Based  on the graph we can see that as effect size increases so does power. There is a positive association until we reach mu=5 and mu =6 where power starts to plateau and even out. 
 
 
 
