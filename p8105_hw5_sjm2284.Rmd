@@ -14,7 +14,7 @@ library(tibble)
 ```
 
 
-## Problem 1 
+# Problem 1 
 
 ```{r}
 
@@ -57,8 +57,9 @@ ggplot( results_table, aes( x = group_size, y = probability)) + geom_line() + ge
 ```
 
 
-## Problem 2
+# Problem 2
 
+## Problem 2a
 ```{r}
 
 sim_power= function(mu, n = 30, sigma = 5, datasets = 5000, alpha = 0.05) {
@@ -95,6 +96,7 @@ results_df =
 ```
 
 
+## Problem 2B
 ```{r}
 
 ggplot( results_df, aes( x = mu, y = power)) + geom_line() + geom_point()+
@@ -110,7 +112,7 @@ ggplot( results_df, aes( x = mu, y = power)) + geom_line() + geom_point()+
 ```
 Based  on the graph we can see that as effect size increases so does power. There is a positive association until we reach mu=5 and mu =6 where power starts to plateau and even out. 
 
-
+## Problem 2C
 
 
 
