@@ -147,7 +147,7 @@ The plot of the average estimate of mu hat vs mu demonstrates a positive linear 
 
 ```{r}
 
-homcide_data = read.csv("")
+homcide_data = read.csv("./homicide-data.csv")
 
 
 ```
