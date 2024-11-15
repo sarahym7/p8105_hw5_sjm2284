@@ -62,35 +62,35 @@ ggplot( results_table, aes( x = group_size, y = probability)) + geom_line() + ge
 ## Problem 2a
 ```{r}
 
-sim_power= function(mu, n = 30, sigma = 5, datasets = 5000, alpha = 0.05) {
-  results = replicate(datasets, {
-    x = rnorm(n, mean = mu, sd = sigma)
-    test = t.test(x, mu = 0)
-    broom::tidy(test)
-  }, simplify = FALSE)
+sim_power= function(mu, n = 30, sigma = 5, datasets = 5000, alpha = 0.05) {  #defining the results
+  results = replicate(datasets, { # use replicate to simulate the sampling of 5000 times
+    x = rnorm(n, mean = mu, sd = sigma) # defining the variables 
+    test = t.test(x, mu = 0)  # set mu to 0 
+    broom::tidy(test)   # tidy the results 
+  }, simplify = FALSE) 
   
-  results_df = bind_rows(results)
+  results_df = bind_rows(results)  # binding the results of the df
   
-  power = mean(results_df$p.value < alpha)
+  power = mean(results_df$p.value < alpha)  # calculating power of the p-value 
   
-  avg_mu_hat = mean(results_df$estimate) 
-  avg_mu_hat_rejected = mean(results_df$estimate[results_df$p.value < alpha])
+  avg_mu_hat = mean(results_df$estimate)  # want the avg mu so take the mean across the estimates
+  avg_mu_hat_rejected = mean(results_df$estimate[results_df$p.value < alpha])  # want the p value rejected of less than 0.05 and take the mean of that 
   
-return(list(mu_hat = avg_mu_hat, power = power, avg_mu_hat_rejected = avg_mu_hat_rejected))
+return(list(mu_hat = avg_mu_hat, power = power, avg_mu_hat_rejected = avg_mu_hat_rejected))  #mapping results above results to this 
   }
 
 
-mu_values =0:6
+mu_values =0:6   #defining the values mu = 1,2,3,4,5,6 ; couldn't do (1,2,3,4,5,6) so did 0:6
 
-results = vector("list", length(mu_values))
+results = vector("list", length(mu_values))   # mapping the list 
 
-for( i in 1:length(mu_values)){
+for( i in 1:length(mu_values)){   # for loop of the length for each iteration length  of the mu value 
   mu = mu_values[i]
   results[[i]] = sim_power(mu)
 
 }
 
-results_df = bind_rows(results) %>% 
+results_df = bind_rows(results) %>%   # binding the rows to have a tibble and then mutating mu to mu values 
   mutate(mu = mu_values)
 
 
@@ -138,13 +138,19 @@ mu_mu_rejected = ggplot( results_df, aes( x = mu, y = avg_mu_hat_rejected)) + ge
 Overlaying the graphs
 
 ```{r}
-(mu_true/ mu_mu_rejected)
+(mu_true/ mu_mu_rejected) # pathwork to overlay?
 
 ```
-The plot of the average estimate of mu hat vs mu demonstrates a positive linear relationship, as true value of mu increases so does the average estimate of mu hat. For the second plot of the Average Estimate of Mu hat rejected vs the true mu we can see that there is also a positive association however their trends differ. For instance, from 0-1 the true value of mu increases linearly but after that it begins to increase exponentially at 2 and on wards. Lastly, we can conclude that the sample average of mu hat across the tests for which the null is rejected approximately equal to the true value of mu because of their linear relationship; they both share the almost the same unit increase/ slope. 
+The plot of the average estimate of mu hat vs mu demonstrates a positive linear relationship, as true value of mu increases so does the average estimate of mu hat. For the second plot of the Average Estimate of Mu hat rejected vs the true mu we can see that there is also a positive association however their trends differ. For instance, from 0-1 the true value of mu increases linearly but after that it begins to increase exponentially at 2 and on wards. Lastly, we conclude that the sample average of mu hat across the tests for which the null is rejected is approximately equal to the true value of mu because of there is somewhat of a linear relationship. If the linear relationship were to be full linear then the slopes would be the same and they would be equal to each other however in this graph it starts linear from 0-1 and then increases exponentially.
+
+## Question 3 
+
+```{r}
 
 
 
+
+```
 
 
 
