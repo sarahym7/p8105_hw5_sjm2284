@@ -108,7 +108,7 @@ ggplot( results_df, aes( x = mu, y = power)) + geom_line() + geom_point()+
   )
 
 ```
-Based  on the graph we can see that as effect size increases so does power. There is a positive association until we reach mu=5 and mu =6 where power starts to plateau and even out. 
+Based  on the graph we can see that as effect size increases so does power. There is a positive association until we reach mu=5 and mu =6 where power starts to plateau and even out. This association is true because if we were to increase effect size this will allow for a type 1 error to occur ( rejecting the null when it should be failed).
 
 ## Problem 2C
 
@@ -147,7 +147,7 @@ The plot of the average estimate of mu hat vs mu demonstrates a positive linear 
 
 ```{r}
 
-
+homcide_data = read.csv("")
 
 
 ```
