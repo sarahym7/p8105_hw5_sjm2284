@@ -5,7 +5,7 @@ date: "2024-11-05"
 output: github_document
 ---
 
-```{r}
+```{r, message=FALSE}
 library(tidyverse)
 library(rvest)
 library(stringr)
@@ -16,7 +16,7 @@ library(patchwork)
 
 # Problem 1 
 
-```{r}
+```{r, message=FALSE}
 
 same_birthday = function(n) { 
   birthday = sample(1:365, n, replace = TRUE)
@@ -30,7 +30,7 @@ results = same_birthday(n)
 
 ```
 
-```{r}
+```{r, message=FALSE}
 
 simulate_probabilities = function(group_size, num_simulations) {
   results = map(1:num_simulations, ~same_birthday(group_size))
@@ -45,7 +45,7 @@ results_table = tibble(
 
 ```
 
-```{r}
+```{r, message=FALSE}
 
 ggplot( results_table, aes( x = group_size, y = probability)) + 
   geom_line() +
@@ -62,7 +62,7 @@ ggplot( results_table, aes( x = group_size, y = probability)) +
 # Problem 2
 
 ## Problem 2a
-```{r}
+```{r, message=FALSE}
 
 sim_power= function(mu, n = 30, sigma = 5, datasets = 5000, alpha = 0.05) {  #defining the results
   results = replicate(datasets, { # use replicate to simulate the sampling of 5000 times
@@ -100,7 +100,7 @@ results_df = bind_rows(results) %>%   # binding the rows to have a tibble and th
 
 
 ## Problem 2B
-```{r}
+```{r, message=FALSE}
 
 ggplot( results_df, aes( x = mu, y = power)) +
   geom_line() + 
@@ -116,7 +116,7 @@ Based  on the graph we can see that as effect size increases so does power. Ther
 
 ## Problem 2C
 
-```{r}
+```{r, message=FALSE}
 mu_true = ggplot( results_df, aes( x = mu, y = mu_hat)) + 
   geom_line() + 
   geom_point()+
@@ -129,7 +129,7 @@ mu_true = ggplot( results_df, aes( x = mu, y = mu_hat)) +
 ```
 
 
-```{r}
+```{r, message=FALSE}
 
 mu_mu_rejected = ggplot( results_df, aes( x = mu, y = avg_mu_hat_rejected)) +
   geom_line() + 
@@ -145,18 +145,20 @@ mu_mu_rejected = ggplot( results_df, aes( x = mu, y = avg_mu_hat_rejected)) +
 
 Overlaying the graphs
 
-```{r}
+```{r, message=FALSE}
 (mu_true/ mu_mu_rejected) # patchwork to overlay?
 
 ```
+
+
 The plot of the average estimate of mu hat vs mu demonstrates a positive linear relationship, as true value of mu increases so does the average estimate of mu hat. For the second plot of the Average Estimate of Mu hat rejected vs the true mu we can see that there is also a positive association however their trends differ. For instance, from 0-1 the true value of mu increases linearly but after that it begins to increase exponentially at 2 and on wards. Lastly, we conclude that the sample average of mu hat across the tests for which the null is rejected is approximately equal to the true value of mu because of there is somewhat of a linear relationship. If the linear relationship were to be full linear then the slopes would be the same and they would be equal to each other however in this graph it starts linear from 0-1 and then increases exponentially.
 
 # Question 3 
 
 
-##Question 3A
+## Question 3A
 
-```{r}
+```{r, message=FALSE}
 
 homicide_raw_data = read.csv("./homicide-data.csv")
 
@@ -168,7 +170,7 @@ homicide_raw_data = read.csv("./homicide-data.csv")
 The raw homicide data contains `r ncol(homicide_raw_data)` variables and `r nrow(homicide_raw_data)` observations. Additionally, the names of the variables of interest are `r names(homicide_raw_data )`. 
 
 
-```{r}
+```{r, message=FALSE}
 
 homicide = homicide_raw_data %>% 
   unite(city_state, city, state, sep = ",") %>% 
@@ -254,8 +256,8 @@ print(baltimore_homicide) # printing the final results for your reference
   estimate    = map_dbl(tidy_result, "estimate"), # use map_dbl to extract the estimate, upper and lower limits
   lower_limit = map_dbl(tidy_result, "conf.low"),
   upper_limit = map_dbl(tidy_result, "conf.high"))%>%
-  select(city_state, estimate, lower_limit, upper_limit) #selecting only the variables of interest. 
-
+  select(city_state, estimate, lower_limit, upper_limit) %>%  #selecting only the variables of interest. 
+  mutate(city_state = fct_reorder(city_state, estimate))
 ```
 
 
@@ -263,7 +265,7 @@ print(baltimore_homicide) # printing the final results for your reference
 
 ```{r}
 
-plot = ggplot(all_cities, aes(x = city_state, y = estimate, group=1 )) + 
+plot = ggplot(all_cities, aes(x = city_state, y = estimate, group=1 )) +  #want to connect the points and geom_line alone won't work so use group =1 so r can treat all the points as if they belonged to one group
   geom_line() + 
   geom_point() + 
   geom_errorbar(aes(ymin = lower_limit, ymax = upper_limit), width = 0.2) + 
@@ -272,5 +274,8 @@ plot = ggplot(all_cities, aes(x = city_state, y = estimate, group=1 )) +
        y = "Estimated Proportion") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-```
 
+print(plot)  # so we can see the plot 
+
+```
+From the graph we see that Tulsa, AL has the lowest proportion of unsolved homicides and a very wide confidence interval. Then we can see that Chicago, IL has the highest proportion of unsolved homicides and this can be held true given that Chicago has a high crime and homicide rate. 
