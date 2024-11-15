@@ -174,7 +174,7 @@ The raw homicide data contains with city_state contains `r ncol(homicide_raw_dat
 
 ```{r}
 
-# filtering for Balitmore, MD and creating total_hom and total_usolved variables again so object can be found
+# filtering for Baltimore, MD and creating total_homicide and total_solved variables again so object can be found
 homicide_MD = homicide %>%
   filter(city_state == "Baltimore,MD") %>%
   summarise(
@@ -195,6 +195,29 @@ prop_homicide_MD_tidy = broom::tidy(prop_homicide_MD)
 estimated_proportion = pull(prop_homicide_MD_tidy , estimate)
 lower_limit = pull(prop_homicide_MD_tidy , conf.low)
 upper_limit = pull(prop_homicide_MD_tidy , conf.high)
+
+
+
+# other way of doing it 
+
+baltimore_homicide = homicide_raw_data %>% 
+  unite(city_state, city, state, sep = ",") %>% 
+  group_by(city_state) %>% 
+  summarise(
+   total_homicides = n(),
+   total_unsovled = sum(disposition!= "Closed by arrest") 
+  ) %>% 
+  filter(city_state == "Baltimore,MD") %>% 
+  rowwise() %>%  #to compute one row at a time
+  mutate(
+  test = list( prop.test (x = total_unsovled , n =  total_homicides)), # list will create object
+  tidy_result = list(broom::tidy(test)),  # tidying up the test
+  estimate = test$estimate,  #pulling the estimate and CI
+  lower_limit = test$conf.int[1],
+  upper_limit = test$conf.int[2]) %>% 
+  unnest(c(estimate, lower_limit, upper_limit)) %>%  # unnest to return as a table
+  select(city_state, estimate, lower_limit, upper_limit) # selecting the variables of interest
+  
 
 
 ```
