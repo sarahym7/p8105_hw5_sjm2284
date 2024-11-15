@@ -154,13 +154,50 @@ homicide_raw_data = read.csv("./homicide-data.csv")
 
 ```
 
-The raw homicide data contains `r ncol(homicide_raw_data)` variables and `r nrow(homicide_raw_data)` observations. Additionally, the names of the variables of interest are `r names(homicide_raw_data )` 
+The raw homicide data contains `r ncol(homicide_raw_data)` variables and `r nrow(homicide_raw_data)` observations. Additionally, the names of the variables of interest are `r names(homicide_raw_data )`. 
 
 
+```{r}
+
+homicide = homicide_raw_data %>% 
+  unite(city_state, city, state, sep = ",") %>% 
+  group_by(city_state) %>% 
+  summarise(
+   total_homicides = n(),
+   total_unsovled = sum(disposition!= "Closed by arrest") 
+  )
 
 
+```
+
+The raw homicide data contains with city_state contains `r ncol(homicide_raw_data)` variables and `r nrow(homicide_raw_data)` observations. Additionally, the names of the variables of interest are `r names(homicide_raw_data )`. 
+
+```{r}
+
+# filtering for Balitmore, MD and creating total_hom and total_usolved variables again so object can be found
+homicide_MD = homicide %>%
+  filter(city_state == "Baltimore,MD") %>%
+  summarise(
+    total_homicides_MD = sum(total_homicides),
+    total_unsolved_MD = sum(total_unsovled ))
+
+# creating a new df with the proportion of homicide using prop.test  
+prop_homicide_MD =   
+prop.test( 
+  x = homicide_MD$total_unsolved_MD ,
+  n = homicide_MD$total_homicides_MD
+  )
+
+# we can broom::tidy the above df so we must broom tidy the df once the prop.test is executed.Here we use broom::tidy
+prop_homicide_MD_tidy = broom::tidy(prop_homicide_MD)
+
+# Pulling the estimated proportion and confidence intervals of the resulting df
+estimated_proportion = pull(prop_homicide_MD_tidy , estimate)
+lower_limit = pull(prop_homicide_MD_tidy , conf.low)
+upper_limit = pull(prop_homicide_MD_tidy , conf.high)
 
 
+```
 
 
 
