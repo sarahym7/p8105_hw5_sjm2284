@@ -47,7 +47,9 @@ results_table = tibble(
 
 ```{r}
 
-ggplot( results_table, aes( x = group_size, y = probability)) + geom_line() + geom_point()+
+ggplot( results_table, aes( x = group_size, y = probability)) + 
+  geom_line() +
+  geom_point()+
   labs (
     title = "Group Size vs Probaility of Same Birthday ",
     x = "Group Size",
@@ -100,7 +102,9 @@ results_df = bind_rows(results) %>%   # binding the rows to have a tibble and th
 ## Problem 2B
 ```{r}
 
-ggplot( results_df, aes( x = mu, y = power)) + geom_line() + geom_point()+
+ggplot( results_df, aes( x = mu, y = power)) +
+  geom_line() + 
+  geom_point()+
   labs (
     title = " Proportion of Times Null Was Rejected vs Mu",
     x = "True Value of Mu",
@@ -113,7 +117,9 @@ Based  on the graph we can see that as effect size increases so does power. Ther
 ## Problem 2C
 
 ```{r}
-mu_true = ggplot( results_df, aes( x = mu, y = mu_hat)) + geom_line() + geom_point()+
+mu_true = ggplot( results_df, aes( x = mu, y = mu_hat)) + 
+  geom_line() + 
+  geom_point()+
   labs (
     title = " Average Estimate of Mu hat vs True Value Mu",
     x = "True Value of Mu",
@@ -125,7 +131,9 @@ mu_true = ggplot( results_df, aes( x = mu, y = mu_hat)) + geom_line() + geom_poi
 
 ```{r}
 
-mu_mu_rejected = ggplot( results_df, aes( x = mu, y = avg_mu_hat_rejected)) + geom_line() + geom_point()+
+mu_mu_rejected = ggplot( results_df, aes( x = mu, y = avg_mu_hat_rejected)) +
+  geom_line() + 
+  geom_point()+
   labs (
     title = " Average Estimate of Mu hat Rejected vs True Value Mu",
     x = "True Value of Mu",
@@ -143,7 +151,10 @@ Overlaying the graphs
 ```
 The plot of the average estimate of mu hat vs mu demonstrates a positive linear relationship, as true value of mu increases so does the average estimate of mu hat. For the second plot of the Average Estimate of Mu hat rejected vs the true mu we can see that there is also a positive association however their trends differ. For instance, from 0-1 the true value of mu increases linearly but after that it begins to increase exponentially at 2 and on wards. Lastly, we conclude that the sample average of mu hat across the tests for which the null is rejected is approximately equal to the true value of mu because of there is somewhat of a linear relationship. If the linear relationship were to be full linear then the slopes would be the same and they would be equal to each other however in this graph it starts linear from 0-1 and then increases exponentially.
 
-## Question 3 
+# Question 3 
+
+
+##Question 3A
 
 ```{r}
 
@@ -171,6 +182,8 @@ homicide = homicide_raw_data %>%
 ```
 
 The raw homicide data contains with city_state contains `r ncol(homicide_raw_data)` variables and `r nrow(homicide_raw_data)` observations. Additionally, the names of the variables of interest are `r names(homicide_raw_data )`. 
+
+## Problem 3B
 
 ```{r}
 
@@ -218,9 +231,46 @@ baltimore_homicide = homicide_raw_data %>%
   unnest(c(estimate, lower_limit, upper_limit)) %>%  # unnest to return as a table
   select(city_state, estimate, lower_limit, upper_limit) # selecting the variables of interest
   
-
+print(baltimore_homicide) # printing the final results for your reference
 
 ```
 
 
+## Problem 3c
+
+
+```{r}
+
+ all_cities = homicide_raw_data %>% 
+  unite(city_state, city, state, sep = ",") %>% 
+  group_by(city_state) %>% 
+  summarise(
+   total_homicides = n(),
+   total_unsovled = sum(disposition!= "Closed by arrest") 
+  ) %>% 
+  mutate(
+  test = map2( total_unsovled,total_homicides, ~ prop.test (.x, .y)), # applying map2 to each pair in proptest  
+  tidy_result = map(test, broom::tidy),# cleaning the results of mapping
+  estimate    = map_dbl(tidy_result, "estimate"), # use map_dbl to extract the estimate, upper and lower limits
+  lower_limit = map_dbl(tidy_result, "conf.low"),
+  upper_limit = map_dbl(tidy_result, "conf.high"))%>%
+  select(city_state, estimate, lower_limit, upper_limit) #selecting only the variables of interest. 
+
+```
+
+
+## Problem 3D
+
+```{r}
+
+plot = ggplot(all_cities, aes(x = city_state, y = estimate, group=1 )) + 
+  geom_line() + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = lower_limit, ymax = upper_limit), width = 0.2) + 
+  labs(title = "Estimated Proportion of Unsolved Homicides with Confidence Intervals", 
+       x = "City, State", 
+       y = "Estimated Proportion") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
 
