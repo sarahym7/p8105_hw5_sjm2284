@@ -278,4 +278,8 @@ plot = ggplot(all_cities, aes(x = city_state, y = estimate, group=1 )) +  #want 
 print(plot)  # so we can see the plot 
 
 ```
+
+
+
+
 From the graph we see that Tulsa, AL has the lowest proportion of unsolved homicides and a very wide confidence interval. Then we can see that Chicago, IL has the highest proportion of unsolved homicides and this can be held true given that Chicago has a high crime and homicide rate. 
